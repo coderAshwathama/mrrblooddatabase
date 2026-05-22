@@ -82,7 +82,7 @@ function DisclaimerModal({ isOpen, onClose, onDontShowAgain }) {
               onChange={(e) => setDontShowAgain(e.target.checked)}
               aria-label="Don't show this again"
             />
-            <span>यो फरक पल नदेखाउनु / Don't show this again</span>
+            <span> Don't show this again</span>
           </label>
           <button className="btn-disclaimer-agree" onClick={handleClose}>
             मैले बुझें / I Understand
