@@ -852,8 +852,12 @@ body,
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap");
 
 .nepali-text {
-  font-family: "Noto Sans Devanagari", -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
+  font-family:
+    "Noto Sans Devanagari",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
   line-height: 1.8;
 }
 
@@ -973,12 +977,33 @@ body,
 
 .disclaimer-actions {
   display: flex;
+  flex-direction: column;
   gap: 1rem;
   margin-top: 2rem;
 }
 
+.disclaimer-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.disclaimer-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--primary-red);
+}
+
+.disclaimer-checkbox span {
+  line-height: 1.4;
+}
+
 .btn-disclaimer-agree {
-  flex: 1;
+  width: 100%;
   background: linear-gradient(
     135deg,
     var(--primary-red) 0%,

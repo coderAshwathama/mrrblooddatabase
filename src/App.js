@@ -39,21 +39,13 @@ function App() {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorModal, setErrorModal] = useState({ isOpen: false, error: null });
   const [showDisclaimer, setShowDisclaimer] = useState(() => {
-    // Check if disclaimer has been shown before
-    return !localStorage.getItem("disclaimerShown");
+    // Check if user has opted not to show again
+    return localStorage.getItem("disclaimerDontShowAgain") !== "true";
   });
 
-  // Show disclaimer on first load
-  useEffect(() => {
-    if (showDisclaimer) {
-      const handleDisclaimerClose = () => {
-        setShowDisclaimer(false);
-        localStorage.setItem("disclaimerShown", "true");
-      };
-      // Store the close handler for later use
-      window.handleDisclaimerClose = handleDisclaimerClose;
-    }
-  }, [showDisclaimer]);
+  const handleDisclaimerDontShowAgain = () => {
+    localStorage.setItem("disclaimerDontShowAgain", "true");
+  };
 
   // Normalize newly added donors too
   const normalizedAdditionalDonors = additionalDonors.map((donor) => ({
@@ -277,10 +269,8 @@ function App() {
 
       <DisclaimerModal
         isOpen={showDisclaimer}
-        onClose={() => {
-          setShowDisclaimer(false);
-          localStorage.setItem("disclaimerShown", "true");
-        }}
+        onClose={() => setShowDisclaimer(false)}
+        onDontShowAgain={handleDisclaimerDontShowAgain}
       />
     </div>
   );
