@@ -847,3 +847,181 @@ body,
     font-size: 1.3rem;
   }
 }
+
+/* Nepali Font Support */
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap");
+
+.nepali-text {
+  font-family: "Noto Sans Devanagari", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  line-height: 1.8;
+}
+
+/* Scroll to Top Button */
+.scroll-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 999;
+}
+
+.scroll-to-top-button {
+  background: linear-gradient(
+    135deg,
+    var(--primary-red) 0%,
+    var(--dark-red) 100%
+  );
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(220, 20, 60, 0.4);
+  transition: all 0.3s ease;
+  animation: slideUp 0.3s ease-out;
+}
+
+.scroll-to-top-button:hover {
+  background: linear-gradient(
+    135deg,
+    var(--dark-red) 0%,
+    var(--primary-red) 100%
+  );
+  box-shadow: 0 6px 16px rgba(220, 20, 60, 0.6);
+  transform: translateY(-3px);
+}
+
+.scroll-to-top-button:active {
+  transform: translateY(-1px);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Disclaimer Modal Styles */
+.disclaimer-modal {
+  max-width: 700px;
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: slideIn 0.3s ease-out;
+}
+
+.disclaimer-header {
+  padding-bottom: 1rem;
+  border-bottom: 3px solid var(--primary-red);
+  margin-bottom: 1.5rem;
+}
+
+.disclaimer-header h2 {
+  color: var(--dark-gray);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.disclaimer-content {
+  margin-bottom: 1.5rem;
+  background: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid var(--primary-red);
+}
+
+.disclaimer-title {
+  font-weight: 700;
+  color: var(--dark-gray);
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.disclaimer-list {
+  list-style-position: inside;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.disclaimer-list li {
+  margin-bottom: 1rem;
+  text-align: justify;
+  color: #444;
+  line-height: 1.8;
+  font-size: 0.95rem;
+}
+
+.disclaimer-footer {
+  text-align: center;
+  font-weight: 700;
+  color: var(--dark-gray);
+  margin-top: 1.5rem;
+  font-size: 1rem;
+}
+
+.disclaimer-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn-disclaimer-agree {
+  flex: 1;
+  background: linear-gradient(
+    135deg,
+    var(--primary-red) 0%,
+    var(--dark-red) 100%
+  );
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-disclaimer-agree:hover {
+  box-shadow: 0 4px 12px rgba(220, 20, 60, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-disclaimer-agree:active {
+  transform: translateY(0);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .disclaimer-modal {
+    max-width: 95%;
+  }
+
+  .disclaimer-content {
+    padding: 1rem;
+  }
+
+  .disclaimer-list li {
+    font-size: 0.9rem;
+  }
+
+  .scroll-to-top-button {
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
+    bottom: 1.5rem;
+    right: 1.5rem;
+  }
+}

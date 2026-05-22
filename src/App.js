@@ -1,11 +1,30 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { donorData } from "./data/donors";
 import SearchFilter from "./components/SearchFilter";
 import DonorList from "./components/DonorList";
 import AddDonorModal from "./components/AddDonorModal";
 import AddDonorForm from "./components/AddDonorForm";
 import ErrorModal from "./components/ErrorModal";
+import ScrollToTop from "./components/ScrollToTop";
+import DisclaimerModal from "./components/DisclaimerModal";
 import "./App.css";
+
+// Normalize district and province names to proper case (First Letter Case)
+const normalizeName = (name) => {
+  if (!name) return "";
+  return name
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
+
+// Normalize donor data
+const normalizedDonorData = donorData.map((donor) => ({
+  ...donor,
+  district: normalizeName(donor.district),
+  province: normalizeName(donor.province),
+}));
 
 function App() {
   const [filters, setFilters] = useState({
@@ -19,15 +38,38 @@ function App() {
   const [additionalDonors, setAdditionalDonors] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorModal, setErrorModal] = useState({ isOpen: false, error: null });
+  const [showDisclaimer, setShowDisclaimer] = useState(() => {
+    // Check if disclaimer has been shown before
+    return !localStorage.getItem("disclaimerShown");
+  });
+
+  // Show disclaimer on first load
+  useEffect(() => {
+    if (showDisclaimer) {
+      const handleDisclaimerClose = () => {
+        setShowDisclaimer(false);
+        localStorage.setItem("disclaimerShown", "true");
+      };
+      // Store the close handler for later use
+      window.handleDisclaimerClose = handleDisclaimerClose;
+    }
+  }, [showDisclaimer]);
+
+  // Normalize newly added donors too
+  const normalizedAdditionalDonors = additionalDonors.map((donor) => ({
+    ...donor,
+    district: normalizeName(donor.district),
+    province: normalizeName(donor.province),
+  }));
 
   // Get unique provinces and districts
   const provinces = useMemo(() => {
-    const allDonors = [...donorData, ...additionalDonors];
+    const allDonors = [...normalizedDonorData, ...normalizedAdditionalDonors];
     return [...new Set(allDonors.map((d) => d.province))].sort();
-  }, [additionalDonors]);
+  }, [normalizedAdditionalDonors]);
 
   const districts = useMemo(() => {
-    const allDonors = [...donorData, ...additionalDonors];
+    const allDonors = [...normalizedDonorData, ...normalizedAdditionalDonors];
     if (filters.province) {
       return [
         ...new Set(
@@ -38,16 +80,16 @@ function App() {
       ].sort();
     }
     return [...new Set(allDonors.map((d) => d.district))].sort();
-  }, [filters.province, additionalDonors]);
+  }, [filters.province, normalizedAdditionalDonors]);
 
   const bloodGroups = useMemo(() => {
-    const allDonors = [...donorData, ...additionalDonors];
+    const allDonors = [...normalizedDonorData, ...normalizedAdditionalDonors];
     return [...new Set(allDonors.map((d) => d.bloodGroup))].sort();
-  }, [additionalDonors]);
+  }, [normalizedAdditionalDonors]);
 
   // Filter donors based on search criteria
   const filteredDonors = useMemo(() => {
-    const allDonors = [...donorData, ...additionalDonors];
+    const allDonors = [...normalizedDonorData, ...normalizedAdditionalDonors];
     return allDonors.filter((donor) => {
       const matchProvince =
         !filters.province || donor.province === filters.province;
@@ -61,7 +103,7 @@ function App() {
 
       return matchProvince && matchDistrict && matchBloodGroup && matchName;
     });
-  }, [filters, additionalDonors]);
+  }, [filters, normalizedAdditionalDonors]);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -81,19 +123,28 @@ function App() {
   };
 
   const handleAddDonor = (formData) => {
-    const allDonors = [...donorData, ...additionalDonors];
+    // Normalize the form data
+    const normalizedFormData = {
+      ...formData,
+      district: normalizeName(formData.district),
+      province: normalizeName(formData.province),
+    };
+
+    const allDonors = [...normalizedDonorData, ...normalizedAdditionalDonors];
 
     // Check for exact match (name + phone)
     const exactMatch = allDonors.find(
       (donor) =>
-        donor.fullName.toLowerCase() === formData.fullName.toLowerCase() &&
-        (donor.phone === formData.phone ||
-          (formData.phoneSecondary &&
-            donor.phone === formData.phoneSecondary) ||
-          (donor.phoneSecondary && donor.phoneSecondary === formData.phone) ||
+        donor.fullName.toLowerCase() ===
+          normalizedFormData.fullName.toLowerCase() &&
+        (donor.phone === normalizedFormData.phone ||
+          (normalizedFormData.phoneSecondary &&
+            donor.phone === normalizedFormData.phoneSecondary) ||
           (donor.phoneSecondary &&
-            formData.phoneSecondary &&
-            donor.phoneSecondary === formData.phoneSecondary)),
+            donor.phoneSecondary === normalizedFormData.phone) ||
+          (donor.phoneSecondary &&
+            normalizedFormData.phoneSecondary &&
+            donor.phoneSecondary === normalizedFormData.phoneSecondary)),
     );
 
     if (exactMatch) {
@@ -116,12 +167,14 @@ function App() {
     // Check for phone number match only
     const phoneMatch = allDonors.find(
       (donor) =>
-        donor.phone === formData.phone ||
-        (formData.phoneSecondary && donor.phone === formData.phoneSecondary) ||
-        (donor.phoneSecondary && donor.phoneSecondary === formData.phone) ||
+        donor.phone === normalizedFormData.phone ||
+        (normalizedFormData.phoneSecondary &&
+          donor.phone === normalizedFormData.phoneSecondary) ||
         (donor.phoneSecondary &&
-          formData.phoneSecondary &&
-          donor.phoneSecondary === formData.phoneSecondary),
+          donor.phoneSecondary === normalizedFormData.phone) ||
+        (donor.phoneSecondary &&
+          normalizedFormData.phoneSecondary &&
+          donor.phoneSecondary === normalizedFormData.phoneSecondary),
     );
 
     if (phoneMatch) {
@@ -144,11 +197,11 @@ function App() {
     const newDonor = {
       id:
         Math.max(
-          ...donorData.map((d) => d.id),
-          ...additionalDonors.map((d) => d.id),
+          ...normalizedDonorData.map((d) => d.id),
+          ...normalizedAdditionalDonors.map((d) => d.id),
           0,
         ) + 1,
-      ...formData,
+      ...normalizedFormData,
     };
     setAdditionalDonors([...additionalDonors, newDonor]);
     setIsModalOpen(false);
@@ -170,7 +223,8 @@ function App() {
           <div>
             <h2>Search Blood Donors</h2>
             <p className="total-donors">
-              Total Donors: {[...donorData, ...additionalDonors].length}
+              Total Donors:{" "}
+              {[...normalizedDonorData, ...normalizedAdditionalDonors].length}
             </p>
           </div>
           <button
@@ -217,6 +271,16 @@ function App() {
         isOpen={errorModal.isOpen}
         error={errorModal.error}
         onClose={() => setErrorModal({ isOpen: false, error: null })}
+      />
+
+      <ScrollToTop />
+
+      <DisclaimerModal
+        isOpen={showDisclaimer}
+        onClose={() => {
+          setShowDisclaimer(false);
+          localStorage.setItem("disclaimerShown", "true");
+        }}
       />
     </div>
   );
